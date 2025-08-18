@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@googlemaps/markerclusterer": "^2.6.2",
     "@prisma/client": "^6.14.0",
     "@vis.gl/react-google-maps": "^1.5.5",
     "next": "15.4.6",
