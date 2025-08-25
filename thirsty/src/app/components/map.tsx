@@ -1,7 +1,6 @@
 "use client";
 
-import ReactDOM from "react-dom/client";
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
     APIProvider,
     Map,
@@ -80,9 +79,9 @@ const PoiMarkers = (props: {pois: Marker[]}) => {
     );
 };
 
-async function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
+function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
     const[newMarker, setNewMarker] = useState<Marker | null>(null);
-    const [markers, setMarkers] = useState<Marker[]>([]);
+    // const [markers, setMarkers] = useState<Marker[]>([]);
 
     // User clicks to select a place for a new marker
     const handleClick = async (event: MapMouseEvent) => {
@@ -90,6 +89,8 @@ async function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
 
         // Save the new marker's information for sending to the backend
         const loc = event.detail.latLng;
+
+        // Add the POI to the currently rendering list
         setNewMarker({ // All default values to be changed by the form later
             key: "0",
             location: loc,
@@ -100,24 +101,16 @@ async function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
             hasHotWater: false,
             hasColdWater: false
         });
-
-        // Add the POI to the currently rendering list
     }
 
-    const { lat, lng, title, image, description, hasHot, hasCold } = await fetch("/api/markers/get");
-    const location = { lat: lat, lng: lng } as google.maps.LatLngLiteral;
-    setMarkers([...markers, 
-        {
-            key: "1", // Add logic to increment the key starting at 1?
-            location: location,
-
-            title: title,
-            image: image,
-            description: description,
-            hasHotWater: hasHot,
-            hasColdWater: hasCold
-        }
-    ]);
+    // useEffect(() => {
+    //     async function fetchMarkers() {
+    //         const res = await fetch("/api/markers/get");
+    //         const data = res.json();
+    //         setMarkers(data); // Make sure the prop for PoiMarkers matches this
+    //     }
+    //     fetchMarkers();
+    // }, []);
 
     return (
         <APIProvider apiKey={apiKey} onLoad={() => console.log("Maps API has loaded.")}>
@@ -129,12 +122,21 @@ async function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
                     onCameraChanged={(ev: MapCameraChangedEvent) =>
                         console.log("camera changed:", ev.detail.center, "zoom:", ev.detail.zoom)
                     }
+                    onClick={handleClick}
                 >
                     {/* Null because I don't have any markers on the backend to dynamically render yet */}
                     <PoiMarkers pois={markers}/> 
 
                     {/* Special marker that only shows up if user clicks to add a new location. */}
-                    {newMarker && <AdvancedMarker />}
+                    {newMarker &&
+                        <AdvancedMarker
+                            key={newMarker.key}
+                            position={newMarker.location}
+                            >
+                            <Pin background={'#FF0000'} glyphColor={'#000'} borderColor={'#000'} />
+                        </AdvancedMarker>
+                    
+                    }
                 </Map>
             </div>
         </APIProvider>
