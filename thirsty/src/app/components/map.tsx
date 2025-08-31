@@ -47,17 +47,18 @@ const markers: Marker[] = [
     },
 ];
 
+function MapPanToSelectedMarker({ selectedMarker }: { selectedMarker: Marker | null }) {
+    const map = useMap();
+    useEffect(() => {
+        if (map && selectedMarker) {
+            map.panTo(selectedMarker.location);
+        }
+    }, [map, selectedMarker]);
+    return null;
+}
+
 // Marker components. Contains on-click handling logic for rendering info windows.
 const PoiMarkers = (props: {pois: Marker[], onMarkerClick: (marker: Marker) => void }) => {
-    const map = useMap();
-
-    const handleMarkerClick = (marker: Marker) => {
-        if (map) {
-            map.panTo(marker.location);
-        }
-        props.onMarkerClick(marker);
-    };
-
     return (
         <>
             {props.pois.map( (poi: Marker) => (
@@ -157,7 +158,10 @@ function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
                     }
                     onClick={handleClick}
                 >
-                    {/* Null because I don't have any markers on the backend to dynamically render yet */}
+
+                    {/* Pan the map to the selected marker when it changes */}
+                    <MapPanToSelectedMarker selectedMarker={selectedMarker} />
+
                     <PoiMarkers pois={markers} onMarkerClick={handleMarkerClick}/>
 
                     {/* Info window! */}
