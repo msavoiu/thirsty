@@ -26,19 +26,21 @@ function NewMarkerForm({ latitude, longitude }: NewMarkerFormProps) {
         formData.append("description", description);
         formData.append("hasHotWater", String(hasHot));
         formData.append("hasColdWater", String(hasCold));
-        // if (image) {
-        //     formData.append("image", image);
-        // }
+        formData.append("latitude", String(latitude));
+        formData.append("longitude", String(longitude));
 
-        // // API route that stores marker to database
-        // const res = await fetch("/api/markers/new", {
-        //     method: "POST",
-        //     body: formData,
-        // });
+        if (image) {
+            formData.append("image", image);
+        }
 
-        // setUploadSuccess(res.ok);
+        // Send repquest API route that stores marker to database
+        const res = await fetch("/api/markers/new", {
+            method: "POST",
+            body: formData,
+        });
 
-        setUploadSuccess(true);
+        console.log(res.message);
+        setUploadSuccess(res.ok);
     }
 
     return(
