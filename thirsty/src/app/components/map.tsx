@@ -93,6 +93,7 @@ function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
 
     useEffect(() => {
         if (navigator.geolocation) {
+            console.log("Geolocation retrieved.")
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     setCenter({
@@ -146,8 +147,8 @@ function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
             <div style={{ width: "100%", height: "500px"}}>
                 <Map
                     mapId={mapId}
-                    defaultZoom={13}
-                    center={center} // Dynamic center
+                    defaultZoom={18}
+                    defaultCenter={center} // Dynamic center
                     onCameraChanged={(ev: MapCameraChangedEvent) =>
                         console.log("camera changed:", ev.detail.center, "zoom:", ev.detail.zoom)
                     }
