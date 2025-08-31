@@ -18,10 +18,12 @@ model User {
   @@map(name: "users")
 }
 
-model Entry {
+model Marker {
   id            Int       @id @default(autoincrement())
-  x             Float
-  y             Float
+  name          String
+  lat           Float
+  lng           Float
+  image_url     String
   description   String
   user          User?     @relation(fields: [userId], references: [id])
   userId        Int?
