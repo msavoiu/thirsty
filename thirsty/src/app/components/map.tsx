@@ -82,10 +82,31 @@ const PoiMarkers = (props: {pois: Marker[]}) => {
 };
 
 function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
+    const [center, setCenter] = useState<{ lat: number; lng: number }>({
+        lat: 33.8823,
+        lng: -117.8851, // CSUF default location
+    });
     const[currentLat, setCurrentLat] = useState<Number>(0);
     const[currentLng, setCurrentLng] = useState<Number>(0);
     const[newMarker, setNewMarker] = useState<Marker | null>(null);
     // const [markers, setMarkers] = useState<Marker[]>([]);
+
+    useEffect(() => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    setCenter({
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude,
+                    });
+                },
+                (error) => {
+                    console.warn("Geolocation error:", error);
+                    // Fallback to default center
+                }
+            );
+        }
+    }, []);
 
     // User clicks to select a place for a new marker
     const handleClick = async (event: MapMouseEvent) => {
@@ -126,7 +147,7 @@ function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
                 <Map
                     mapId={mapId}
                     defaultZoom={13}
-                    defaultCenter={{ lat: 33.8823, lng: -117.8851 }}
+                    center={center} // Dynamic center
                     onCameraChanged={(ev: MapCameraChangedEvent) =>
                         console.log("camera changed:", ev.detail.center, "zoom:", ev.detail.zoom)
                     }
