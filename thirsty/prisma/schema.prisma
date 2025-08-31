@@ -21,14 +21,16 @@ model User {
 
 model Marker {
   id                Int       @id @default(autoincrement())
-  name              String
   lat               Float
+  name              String
+  hasHotWater       Boolean
+  hasColdWater      Boolean
   lng               Float
   image_url         String
   description       String
   user              User?     @relation(fields: [userId], references: [id])
   userId            Int?
-  @@map(name: "entries")
+  @@map(name: "Markers")
 }
 
 model BottleCounter {
