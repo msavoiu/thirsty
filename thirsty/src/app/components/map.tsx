@@ -9,7 +9,8 @@ import {
     Pin,
     useMap,
     InfoWindow,
-    MapMouseEvent
+    MapMouseEvent,
+    latLngEquals
 } from "@vis.gl/react-google-maps";
 
 // Components
@@ -81,6 +82,8 @@ const PoiMarkers = (props: {pois: Marker[]}) => {
 };
 
 function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
+    const[currentLat, setCurrentLat] = useState<Number>(0);
+    const[currentLng, setCurrentLng] = useState<Number>(0);
     const[newMarker, setNewMarker] = useState<Marker | null>(null);
     // const [markers, setMarkers] = useState<Marker[]>([]);
 
@@ -90,6 +93,10 @@ function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
 
         // Save the new marker's information for sending to the backend
         const loc = event.detail.latLng;
+
+        const { lat, lng } = loc;
+        setCurrentLat(lat);
+        setCurrentLng(lng);
 
         // Add the POI to the currently rendering list
         setNewMarker({ // All default values to be changed by the form later
@@ -140,7 +147,7 @@ function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
                     }
 
                     {newMarker &&
-                        <NewMarkerForm/>
+                        <NewMarkerForm latitude={currentLat} longitude={currentLng}/>
                     }
                 </Map>
             </div>

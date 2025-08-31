@@ -2,8 +2,13 @@
 
 import React, { useState } from "react";
 
-// Props contain latitude and longitude passed on from the main map component
-function NewMarkerForm({}) {
+interface NewMarkerFormProps {
+    latitude: Number;
+    longitude: Number
+}
+
+// Props cpassed on from the map component
+function NewMarkerForm({ latitude, longitude }: NewMarkerFormProps) {
 
     const [name, setName] = useState("")
     const [description, setDescription] = useState("");
@@ -21,17 +26,19 @@ function NewMarkerForm({}) {
         formData.append("description", description);
         formData.append("hasHotWater", String(hasHot));
         formData.append("hasColdWater", String(hasCold));
-        if (image) {
-            formData.append("image", image);
-        }
+        // if (image) {
+        //     formData.append("image", image);
+        // }
 
-        // API route that stores marker to database
-        const res = await fetch("/api/markers/new", {
-            method: "POST",
-            body: formData,
-        });
+        // // API route that stores marker to database
+        // const res = await fetch("/api/markers/new", {
+        //     method: "POST",
+        //     body: formData,
+        // });
 
-        setUploadSuccess(res.ok);
+        // setUploadSuccess(res.ok);
+
+        setUploadSuccess(true);
     }
 
     return(
@@ -80,6 +87,9 @@ function NewMarkerForm({}) {
 
                 <button type="submit">Submit</button>
             </form>
+
+            {(uploadSuccess === false) && <p>Failed to log station. Please try again later.</p>}
+
         </div>
     );
 
