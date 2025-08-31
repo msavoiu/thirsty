@@ -14,6 +14,7 @@ import {
 
 // Components
 import MarkerPopup from "./marker_window";
+import NewMarkerForm from "./new_marker_form"; 
 
 // Type declarations for TS
 type MarkerMapProps = {
@@ -136,6 +137,10 @@ function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
                             <Pin background={'#FF0000'} glyphColor={'#000'} borderColor={'#000'} />
                         </AdvancedMarker>
                     
+                    }
+
+                    {newMarker &&
+                        <NewMarkerForm/>
                     }
                 </Map>
             </div>
