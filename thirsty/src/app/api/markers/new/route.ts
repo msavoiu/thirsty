@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
                 name: name,
                 hasHotWater: hasHotWater,
                 hasColdWater: hasColdWater,
-                image_url: url,
+                image: url,
                 description: description
             }
         });

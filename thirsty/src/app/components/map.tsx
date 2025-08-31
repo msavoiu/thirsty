@@ -34,18 +34,18 @@ type Marker = {
     hasColdWater: boolean;
 }
 
-// TEST marker for development purposes
-const markers: Marker[] = [
-    {
-        key: "1",
-        location: { lat: 33.88413084573613, lng: -117.88127569981039  },
-        name: "CSUF HRE",
-        image: "None",
-        description: "Water station in the break room.",
-        hasHotWater: false,
-        hasColdWater: true
-    },
-];
+// // TEST marker for development purposes
+// const markers: Marker[] = [
+//     {
+//         key: "1",
+//         location: { lat: 33.88413084573613, lng: -117.88127569981039  },
+//         name: "CSUF HRE",
+//         image: "None",
+//         description: "Water station in the break room.",
+//         hasHotWater: false,
+//         hasColdWater: true
+//     },
+// ];
 
 function MapPanToSelectedMarker({ selectedMarker }: { selectedMarker: Marker | null }) {
     const map = useMap();
@@ -87,7 +87,7 @@ function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
     const[currentLat, setCurrentLat] = useState<Number>(0);
     const[currentLng, setCurrentLng] = useState<Number>(0);
     const[newMarker, setNewMarker] = useState<Marker | null>(null);
-    // const [markers, setMarkers] = useState<Marker[]>([]);
+    const [markers, setMarkers] = useState<Marker[]>([]);
 
     useEffect(() => {
         if (navigator.geolocation) {
@@ -101,7 +101,7 @@ function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
                 },
                 (error) => {
                     console.warn("Geolocation error:", error);
-                    // Fallback to default center
+                    // Fall back to default center
                 }
             );
         }
@@ -136,14 +136,27 @@ function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
         setSelectedMarker(marker);
     }
 
-    // useEffect(() => {
-    //     async function fetchMarkers() {
-    //         const res = await fetch("/api/markers/get");
-    //         const data = await res.json();
-    //         setMarkers(data); // Make sure the prop for PoiMarkers matches this
-    //     }
-    //     fetchMarkers();
-    // }, []);
+    useEffect(() => {
+        async function fetchMarkers() {
+            const res = await fetch("/api/markers/get");
+            const data = await res.json();
+
+            // Transform the data to match Marker type
+            const markers: Marker[] = data.markers.map((m: any, idx: number) => ({
+                key: idx.toString(), // or use another unique value if available
+                location: { lat: m.lat, lng: m.lng },
+                name: m.name,
+                image: m.image,
+                description: m.description,
+                hasHotWater: m.hasHotWater,
+                hasColdWater: m.hasColdWater
+            }));
+
+            setMarkers(markers);
+            console.log(markers)
+        }
+        fetchMarkers();
+    }, []);
 
     return (
         <APIProvider apiKey={apiKey} onLoad={() => console.log("Maps API has loaded.")}>
