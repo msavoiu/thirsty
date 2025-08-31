@@ -1,38 +1,33 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 
+// https://visgl.github.io/react-google-maps/docs/api-reference/components/info-window
 function MarkerWindow({
-    closestLocation,
-    desc,
+    name,
+    hasHotWater,
+    hasColdWater,
     image,
-    hasHotCold }:
-    {
-        closestLocation: String,
-        desc: String,
-        image: String?,
-        hasHotCold: Boolean}
-    ) {
-
-    const contentString =
-        `<h1>Water refill station</h1>
-        <>`
-
+    description
+    }: {
+        name: string,
+        hasHotWater: boolean,
+        hasColdWater: boolean,
+        image: string,
+        description: string
+    }) {
 
     return (
-        <div className="marker-popup">
-            <h1>Water refill station</h1>
-            <h2>{closestLocation}</h2>
-
-            {hasHotCold && <p>Hot and cold water available</p>}
-
-            {/* Conditionally render image if the user that submitted uploaded one. */}
-            {image && <img/>}
-
-            <p>
-                <b>Location description:</b>
-                {desc}
-            </p>
+        <div>
+            <h3>{name}</h3>
+            <p>{description}</p>
+            {image !== "None" && (
+                <img src={image} alt={name} style={{ maxWidth: 200 }} />
+            )}
+            <div>
+                {hasHotWater && <span>Hot Water</span>}
+                {hasColdWater && <span>Cold Water</span>}
+            </div>
         </div>
     )
 }

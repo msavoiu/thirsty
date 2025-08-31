@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
     APIProvider,
     Map,
@@ -9,13 +9,13 @@ import {
     Pin,
     useMap,
     InfoWindow,
-    MapMouseEvent,
-    latLngEquals
+    MapMouseEvent
 } from "@vis.gl/react-google-maps";
 
 // Components
-import MarkerPopup from "./marker_window";
+import MarkerWindow from "./marker_window";
 import NewMarkerForm from "./new_marker_form"; 
+import { makeTypedQueryFactory } from "@prisma/client/runtime/library";
 
 // Type declarations for TS
 type MarkerMapProps = {
@@ -27,19 +27,19 @@ type Marker = {
     key: string;
     location: google.maps.LatLngLiteral; 
 
-    title: string;
+    name: string;
     image: string;
     description: string;
     hasHotWater: boolean;
     hasColdWater: boolean;
 }
 
-// Test marker for development purposes
+// TEST marker for development purposes
 const markers: Marker[] = [
     {
         key: "1",
         location: { lat: 33.88413084573613, lng: -117.88127569981039  },
-        title: "CSUF HRE",
+        name: "CSUF HRE",
         image: "None",
         description: "Water station in the break room.",
         hasHotWater: false,
@@ -48,23 +48,15 @@ const markers: Marker[] = [
 ];
 
 // Marker components. Contains on-click handling logic for rendering info windows.
-const PoiMarkers = (props: {pois: Marker[]}) => {
+const PoiMarkers = (props: {pois: Marker[], onMarkerClick: (marker: Marker) => void }) => {
     const map = useMap();
 
-    const handleClick = useCallback((ev: google.maps.MapMouseEvent) => {
-
-        if(!map) return;
-        if(!ev.latLng) return;
-
-        console.log("Marker clicked:", ev.latLng.toString());
-
-        // Pan so the selected marker is centered on the map
-        map.panTo(ev.latLng);
-
-        // Render popup component
-        // ...
-    
-    }, [map]);
+    const handleMarkerClick = (marker: Marker) => {
+        if (map) {
+            map.panTo(marker.location);
+        }
+        props.onMarkerClick(marker);
+    };
 
     return (
         <>
@@ -72,7 +64,7 @@ const PoiMarkers = (props: {pois: Marker[]}) => {
                 <AdvancedMarker
                     key={poi.key}
                     position={poi.location}
-                    onClick={handleClick}
+                    onClick={() => props.onMarkerClick(poi)}
                 >
                     <Pin background={'#FBBC04'} glyphColor={'#000'} borderColor={'#000'} />
                 </AdvancedMarker>
@@ -82,10 +74,15 @@ const PoiMarkers = (props: {pois: Marker[]}) => {
 };
 
 function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
+    // For the start position of the map
     const [center, setCenter] = useState<{ lat: number; lng: number }>({
         lat: 33.8823,
         lng: -117.8851, // CSUF default location
     });
+
+    // For rendering info windows for specified markers
+    const [selectedMarker, setSelectedMarker] = useState<Marker | null>(null);
+
     const[currentLat, setCurrentLat] = useState<Number>(0);
     const[currentLng, setCurrentLng] = useState<Number>(0);
     const[newMarker, setNewMarker] = useState<Marker | null>(null);
@@ -125,7 +122,7 @@ function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
             key: "0",
             location: loc,
 
-            title: "",
+            name: "",
             image: "None",
             description: "",
             hasHotWater: false,
@@ -133,10 +130,15 @@ function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
         });
     }
 
+    // Select marker within PoiMarkers to display an info window for
+    const handleMarkerClick = (marker: Marker) => {
+        setSelectedMarker(marker);
+    }
+
     // useEffect(() => {
     //     async function fetchMarkers() {
     //         const res = await fetch("/api/markers/get");
-    //         const data = res.json();
+    //         const data = await res.json();
     //         setMarkers(data); // Make sure the prop for PoiMarkers matches this
     //     }
     //     fetchMarkers();
@@ -146,6 +148,7 @@ function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
         <APIProvider apiKey={apiKey} onLoad={() => console.log("Maps API has loaded.")}>
             <div style={{ width: "100%", height: "500px"}}>
                 <Map
+
                     mapId={mapId}
                     defaultZoom={18}
                     defaultCenter={center} // Dynamic center
@@ -155,7 +158,23 @@ function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
                     onClick={handleClick}
                 >
                     {/* Null because I don't have any markers on the backend to dynamically render yet */}
-                    <PoiMarkers pois={markers}/> 
+                    <PoiMarkers pois={markers} onMarkerClick={handleMarkerClick}/>
+
+                    {/* Info window! */}
+                    {selectedMarker && (
+                        <InfoWindow
+                            position={selectedMarker.location}
+                            onCloseClick={() => setSelectedMarker(null)}
+                        >
+                            <MarkerWindow
+                                name={selectedMarker.name}
+                                hasHotWater={selectedMarker.hasHotWater}
+                                hasColdWater={selectedMarker.hasColdWater}
+                                image={selectedMarker.image}
+                                description={selectedMarker.description}
+                            />
+                        </InfoWindow>
+                    )}
 
                     {/* Special marker that only shows up if user clicks to add a new location. */}
                     {newMarker &&
