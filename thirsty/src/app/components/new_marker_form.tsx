@@ -39,7 +39,6 @@ function NewMarkerForm({ latitude, longitude }: NewMarkerFormProps) {
             body: formData,
         });
 
-        console.log(res.message);
         setUploadSuccess(res.ok);
     }
 
@@ -79,13 +78,14 @@ function NewMarkerForm({ latitude, longitude }: NewMarkerFormProps) {
                     required/>
                 <label htmlFor="description">Description</label>
 
+                <label htmlFor="image">Image</label>
                 <input
                     id="image"
                     type="file"
                     accept="image/*"
                     onChange={event => setImage(event.target.files?.[0] || null)}
+                    required
                 />
-                <label htmlFor="image">Image</label>
 
                 <button type="submit">Submit</button>
             </form>

@@ -7,7 +7,6 @@ export async function POST(req: NextRequest) {
         const formData = await req.formData();
 
         // Get data uploaded to the frontend form
-        // Not exactly sure if this should be done using formData or a regular JSON body
         const image = formData.get("image") as File;
         const name = formData.get("name") as string;
         const hasHotWater = formData.get("hasHotWater") === "true";
