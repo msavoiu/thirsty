@@ -12,7 +12,7 @@ export async function GET() {
             throw new Error("Unable to fetch bottle count")
         }
 
-        return Response.json({ count: bottleCount.bottles, ok: true }, { status: 200 });
+        return Response.json({ count: bottleCount.count, ok: true }, { status: 200 });
 
     } catch (error: any) {
         return Response.json({ message: error.message, ok: false }, { status: 500 });

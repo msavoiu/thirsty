@@ -10,8 +10,10 @@ datasource db {
 
 model User {
   id                Int       @id @default(autoincrement())
-  name              String?
-  email             String?   @unique
+  name              String
+  profilePicture    String
+  email             String    @unique
+  passwordHash      String
   createdAt         DateTime  @default(now()) @map(name: "created_at")
   updatedAt         DateTime  @updatedAt @map(name: "updated_at")
   markers           Marker[]
@@ -35,5 +37,5 @@ model Marker {
 
 model BottleCounter {
   id            Int       @id @default(autoincrement())
-  bottles       Int
+  count         Int
 }

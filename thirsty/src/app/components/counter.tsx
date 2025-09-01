@@ -10,7 +10,7 @@ function Counter() {
     useEffect(() => {
         async function fetchCount() {
             try {
-                const res = await fetch("api/bottle_count/get");
+                const res = await fetch("api/bottle-count/get");
                 
                 if (!res.ok) {
                     throw new Error("Failed to fetch");
@@ -38,7 +38,7 @@ function Counter() {
                     <span className="counter-text">
                             <p>{count}</p>
                     </span>
-                    <p>single-use plastic bottles saved with your help!</p>
+                    <p>single-use plastic bottles saved with the help of Thirsty!</p>
             </div>
     );
 };
