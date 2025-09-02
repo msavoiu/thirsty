@@ -1,25 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
 import { put } from "@vercel/blob";
 import { prisma } from "@/lib/prisma";
+import jwt from "jsonwebtoken";
 
 export async function POST(req: NextRequest) {
     try {
+        // Grab user ID. No need to authenticate since this won't be called until /api/auth/whoami is.
+
         const formData = await req.formData();
 
         // Get data uploaded to the frontend form
-        const file = formData.get("file") as File;
-        const name = formData.get("name");
-        const hasHotWater = formData.get("hasHotWater");    
-        const hasColdWater = formData.get("hasColdWater");    
-        const description = formData.get("hasHotWater");
-        const userId = formData.get("userId");
+        const image = formData.get("image") as File;
+        const name = formData.get("name") as string;
+        const hasHotWater = formData.get("hasHotWater") === "true";
+        const hasColdWater = formData.get("hasColdWater") === "true";
+        const description = formData.get("description") as string;
+        const latitude = parseFloat(formData.get("latitude") as string);
+        const longitude = parseFloat(formData.get("longitude") as string);
 
-        if (!file) {
-            return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
+        if (!image) {
+            return NextResponse.json({ error: "No image uploaded" }, { status: 400 });
         }
 
         // Upload to Vercel Blob
-        const { url } = await put(file.name, file, {
+        const { url } = await put(image.name, image, {
             access: "public",
             token: process.env.BLOB_READ_WRITE_TOKEN,
         });
@@ -27,22 +31,21 @@ export async function POST(req: NextRequest) {
         // Create new database entry
         const markerUpload = await prisma.marker.create({
             data: {
+                lat: latitude,
+                lng: longitude,
                 name: name,
                 hasHotWater: hasHotWater,
                 hasColdWater: hasColdWater,
-                image_url: url,
-                description: description
-            },
-            user: {
-                connect: { id: userId }
-            }
+                image: url,
+                description: description,
+                user: { connect: { id: userId } }
             }
         });
 
-        return NextResponse.json({ ok: true, markerUpload }, { status: 201 });
+        return NextResponse.json({ ok: true, message: "Station logged.", markerUpload }, { status: 201 });
 
     } catch (error: any) {
-        console.error(error.message)
-        return NextResponse.json({ ok: false, message: "Failed to log to database." }, { status: 500 });
+        console.log(error.message);
+        return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
     }
 }
