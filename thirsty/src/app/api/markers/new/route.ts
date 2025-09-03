@@ -14,6 +14,7 @@ export async function POST(req: NextRequest) {
         const description = formData.get("description") as string;
         const latitude = parseFloat(formData.get("latitude") as string);
         const longitude = parseFloat(formData.get("longitude") as string);
+        const userId = parseInt(formData.get("userId") as string);
 
         if (!image) {
             return NextResponse.json({ error: "No image uploaded" }, { status: 400 });
@@ -23,6 +24,7 @@ export async function POST(req: NextRequest) {
         const { url } = await put(image.name, image, {
             access: "public",
             token: process.env.BLOB_READ_WRITE_TOKEN,
+            addRandomSuffix: true,
         });
 
         // Create new database entry
@@ -34,7 +36,10 @@ export async function POST(req: NextRequest) {
                 hasHotWater: hasHotWater,
                 hasColdWater: hasColdWater,
                 image: url,
-                description: description
+                description: description,
+                user: {
+                    connect:  { id: userId }
+                }
             }
         });
 

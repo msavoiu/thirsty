@@ -33,13 +33,24 @@ function NewMarkerForm({ latitude, longitude }: NewMarkerFormProps) {
             formData.append("image", image);
         }
 
-        // Send repquest API route that stores marker to database
-        const res = await fetch("/api/markers/new", {
+        const authResponse = await fetch("/api/auth/whoami", {
             method: "POST",
-            body: formData,
+            credentials: "include"
         });
+        const userAuth = await authResponse.json();
 
-        setUploadSuccess(res.ok);
+        if (!userAuth.ok) {
+            alert("You are not logged in! Please log in or create an account to add stations to the map.");
+        } else {
+            console.log("userId", userAuth.userId);
+            formData.append("userId", userAuth.userId);
+            const res = await fetch("/api/markers/new", {
+                method: "POST",
+                body: formData
+            });
+
+            setUploadSuccess(res.ok);
+        }
     }
 
     return(
