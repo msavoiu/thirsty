@@ -4,17 +4,27 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
     try {
         const markers = await prisma.marker.findMany({
+        select: {
+            lat: true,
+            lng: true,
+            name: true,
+            hasHotWater: true,
+            hasColdWater: true,
+            image: true,
+            description: true,
+            userId: true,
+            user: {
             select: {
-                lat: true,
-                lng: true,
+                id: true,
                 name: true,
-                hasHotWater: true,
-                hasColdWater: true,
-                image: true,
-                description: true
-            }
+                profilePicture: true,
+            },
+            },
+        },
         });
-        return NextResponse.json({ ok:true, markers: markers }, { status: 200 });
+
+
+        return NextResponse.json({ ok: true, markers: markers }, { status: 200 });
 
     } catch (error: any) {
         console.log(error.message);

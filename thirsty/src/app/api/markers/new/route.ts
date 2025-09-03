@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
         const { url } = await put(image.name, image, {
             access: "public",
             token: process.env.BLOB_READ_WRITE_TOKEN,
-            addRandomSuffix: true,
+            addRandomSuffix: true
         });
 
         // Create new database entry

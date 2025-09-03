@@ -28,10 +28,13 @@ type Marker = {
     location: google.maps.LatLngLiteral; 
 
     name: string;
-    image: string;
-    description: string;
     hasHotWater: boolean;
     hasColdWater: boolean;
+    image: string;
+    description: string;
+    userName: string;
+    userId: string;
+    profilePicture: string;
 }
 
 // // TEST marker for development purposes
@@ -127,7 +130,10 @@ function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
             image: "None",
             description: "",
             hasHotWater: false,
-            hasColdWater: false
+            hasColdWater: false,
+            userName: "",
+            userId: "",
+            profilePicture: ""
         });
     }
 
@@ -146,10 +152,13 @@ function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
                 key: idx.toString(), // or use another unique value if available
                 location: { lat: m.lat, lng: m.lng },
                 name: m.name,
-                image: m.image,
-                description: m.description,
                 hasHotWater: m.hasHotWater,
-                hasColdWater: m.hasColdWater
+                hasColdWater: m.hasColdWater,
+                image: m.image,
+                userName: m.user.name,
+                userId: m.user.id,
+                profilePicture: m.user.profilePicture,
+                
             }));
 
             setMarkers(markers);
@@ -189,6 +198,9 @@ function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
                                 hasColdWater={selectedMarker.hasColdWater}
                                 image={selectedMarker.image}
                                 description={selectedMarker.description}
+                                userName={selectedMarker.userName}
+                                userId={selectedMarker.userId}
+                                profilePicture={selectedMarker.profilePicture}
                             />
                         </InfoWindow>
                     )}
