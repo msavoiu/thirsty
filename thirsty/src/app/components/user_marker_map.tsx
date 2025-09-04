@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
     APIProvider,
     Map,
@@ -14,11 +14,10 @@ import {
 
 // Components
 import MarkerWindow from "./marker_window";
-import NewMarkerForm from "./new_marker_form"; 
 
 // Type declarations for TS
-type MarkerMapProps = {
-    fetchAPI: string;
+type UserMarkerMapProps = {
+    userId: number;
     apiKey: string;
     mapId: string;
 };
@@ -36,19 +35,6 @@ type Marker = {
     userId: string;
     profilePicture: string;
 }
-
-// // TEST marker for development purposes
-// const markers: Marker[] = [
-//     {
-//         key: "1",
-//         location: { lat: 33.88413084573613, lng: -117.88127569981039  },
-//         name: "CSUF HRE",
-//         image: "None",
-//         description: "Water station in the break room.",
-//         hasHotWater: false,
-//         hasColdWater: true
-//     },
-// ];
 
 function MapPanToSelectedMarker({ selectedMarker }: { selectedMarker: Marker | null }) {
     const map = useMap();
@@ -77,7 +63,7 @@ const PoiMarkers = (props: {pois: Marker[], onMarkerClick: (marker: Marker) => v
     );
 };
 
-function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
+function UserMarkerMap({ userId, apiKey, mapId }: UserMarkerMapProps) {
     // For the start position of the map
     const [center, setCenter] = useState<{ lat: number; lng: number }>({
         lat: 33.8823,
@@ -86,10 +72,6 @@ function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
 
     // For rendering info windows for specified markers
     const [selectedMarker, setSelectedMarker] = useState<Marker | null>(null);
-
-    const[currentLat, setCurrentLat] = useState<Number>(0);
-    const[currentLng, setCurrentLng] = useState<Number>(0);
-    const[newMarker, setNewMarker] = useState<Marker | null>(null);
     const [markers, setMarkers] = useState<Marker[]>([]);
 
     useEffect(() => {
@@ -110,33 +92,6 @@ function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
         }
     }, []);
 
-    // User clicks to select a place for a new marker
-    const handleClick = async (event: MapMouseEvent) => {
-        if (!event.detail.latLng) return;
-
-        // Save the new marker's information for sending to the backend
-        const loc = event.detail.latLng;
-
-        const { lat, lng } = loc;
-        setCurrentLat(lat);
-        setCurrentLng(lng);
-
-        // Add the POI to the currently rendering list
-        setNewMarker({ // All default values to be changed by the form later
-            key: "0",
-            location: loc,
-
-            name: "",
-            image: "None",
-            description: "",
-            hasHotWater: false,
-            hasColdWater: false,
-            userName: "",
-            userId: "",
-            profilePicture: ""
-        });
-    }
-
     // Select marker within PoiMarkers to display an info window for
     const handleMarkerClick = (marker: Marker) => {
         setSelectedMarker(marker);
@@ -144,7 +99,18 @@ function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
 
     useEffect(() => {
         async function fetchMarkers() {
-            const res = await fetch("/api/markers/get");
+            const payload = {
+                userId: userId
+            };
+
+            const res = await fetch("/api/markers/get/user", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload)
+            });
+
             const data = await res.json();
 
             // Transform the data to match Marker type
@@ -178,7 +144,6 @@ function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
                     onCameraChanged={(ev: MapCameraChangedEvent) =>
                         console.log("camera changed:", ev.detail.center, "zoom:", ev.detail.zoom)
                     }
-                    onClick={handleClick}
                 >
 
                     {/* Pan the map to the selected marker when it changes */}
@@ -204,25 +169,10 @@ function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
                             />
                         </InfoWindow>
                     )}
-
-                    {/* Special marker that only shows up if user clicks to add a new location. */}
-                    {newMarker &&
-                        <AdvancedMarker
-                            key={newMarker.key}
-                            position={newMarker.location}
-                            >
-                            <Pin background={'#FF0000'} glyphColor={'#000'} borderColor={'#000'} />
-                        </AdvancedMarker>
-                    
-                    }
-
-                    {newMarker &&
-                        <NewMarkerForm latitude={currentLat} longitude={currentLng}/>
-                    }
                 </Map>
             </div>
         </APIProvider>
     );
 }
 
-export default MarkerMap;
+export default UserMarkerMap;
