@@ -2,8 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useUser } from "@/context/UserContext";
 
 export default function Navbar() {
+    const { user, setUser } = useUser();
+
     const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
     const [profilePicture, setProfilePicture] = useState<string | null>("/icon.png");
 
@@ -45,6 +48,20 @@ export default function Navbar() {
         checkLogin();
     }, []);
 
+    const handleLogout = async () => {
+        try {
+            const res = await fetch("/api/auth/logout", { method: "POST" });
+            // Update context
+            setUser(null);
+
+            // // Reload homepage
+            window.location.reload();
+
+        } catch (error) {
+            console.error("Logout failed", error);
+        }
+    };
+
     return (
         <nav className="navbar">
             <div className="navbar-left">
@@ -57,6 +74,11 @@ export default function Navbar() {
                 {loggedIn === true &&
                     <Link href="/">
                         <img src={profilePicture} alt=""/>
+                        <button
+                            onClick={handleLogout}
+                        >
+                            Logout
+                        </button>
                     </Link>
                 }
 

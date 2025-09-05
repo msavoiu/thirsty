@@ -1,10 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
+import { useUser } from "@/context/UserContext";
  
 export default function LoginForm() {
-    const router = useRouter();
+    // const router = useRouter();
+    const { setUser } = useUser();
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -26,9 +28,12 @@ export default function LoginForm() {
         const data = await res.json();
 
         if (data.ok) {
-            alert(data.message);
+            setUser({ name: data.name, profilePicture: data.profilePicture });
+            // alert(data.message);
+
             // Redirect to home page
-            router.push("/");
+            window.location.replace("/");
+            // router.push("/");
         } else {
             setLoginSuccess(false);
             setResponseMessage(data.message);
