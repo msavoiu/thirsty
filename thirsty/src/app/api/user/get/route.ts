@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 import jwt from "jsonwebtoken";
 
 export async function POST(req: NextRequest) {
@@ -18,15 +19,29 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ ok: false, error: "Unauthorized: Invalid token" }, { status: 401 });
         }
 
-        const userId = decoded.userId;
+        const userId = Number(decoded.userId);
         if (!userId) {
             return NextResponse.json({ ok: false, error: "Unauthorized: No user ID in token" }, { status: 401 });
         }
 
-        return NextResponse.json({ ok: true, userId: userId }, { status: 200 });
-        
+        const user = await prisma.user.findUnique({
+            where: {
+                id: userId,
+            },
+            select: {
+                name: true,
+                profilePicture: true
+            }
+        });
+
+        if (!user) {
+            return NextResponse.json({ok: false, message: "User not found" }, { status: 404 });
+        }
+
+        return NextResponse.json({ ok: true, name: user.name, profilePicture: user.profilePicture }, { status: 200 });
+
     } catch (error: any) {
         console.log(error.message);
-        return NextResponse.json({ ok: false, isLoggedIn: false, error: error.message }, { status: 500 });
+        return NextResponse.json({ ok: false, message: error.message }, { status: 500 });
     }
 }
