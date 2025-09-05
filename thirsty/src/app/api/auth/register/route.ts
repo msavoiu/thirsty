@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
             });
             profilePictureUrl = url;
         } else {
-            profilePictureUrl = "None";
+            profilePictureUrl = "/icon.png";
         }
 
         // Store user in the database
