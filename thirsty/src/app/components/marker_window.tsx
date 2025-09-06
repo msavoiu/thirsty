@@ -31,19 +31,24 @@ function MarkerWindow({
     }
 
     return (
-        <div>
-            <p>Logged by: {userName}</p>
-            <img src={pfp} alt="Profile picture" style={{ maxWidth: 75 }}/>
+        <div className="marker-window">
+            <span className="marker-owner">
+                <img src={pfp} alt="Profile picture"/>
+                <p>Logged by {userName}</p>
+            </span>
 
-            <h3>{name}</h3>
-            <p>{description}</p>
+            <h1>{name}</h1>
+
+            <div className="temperatures">
+                {hasHotWater && <span className="hot-water">Hot Water</span>}
+                {hasColdWater && <span className="cold-water">Cold Water</span>}
+            </div>
+
             {image !== "None" && (
                 <img src={image} alt={name} style={{ maxWidth: 200 }} />
             )}
-            <div>
-                {hasHotWater && <span>Hot Water</span>}
-                {hasColdWater && <span>Cold Water</span>}
-            </div>
+            
+            <p>{description}</p>
         </div>
     )
 }

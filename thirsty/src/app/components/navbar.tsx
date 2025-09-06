@@ -8,7 +8,7 @@ export default function Navbar() {
     const { user, setUser } = useUser();
 
     const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
-    const [profilePicture, setProfilePicture] = useState<string | null>("/icon.png");
+    const [profilePicture, setProfilePicture] = useState<string>("/icon.png");
 
     useEffect(() => {
         async function checkLogin() {
@@ -66,11 +66,12 @@ export default function Navbar() {
         <nav className="navbar">
             <div className="navbar-left">
                 <a href="/" className="logo">
-                    Thirsty
+                    <h1>
+                        Thirsty
+                    </h1>
                 </a>
             </div>
             <div className="navbar-right">
-
                 {loggedIn === true &&
                     <Link href="/">
                         <img src={profilePicture} alt=""/>

@@ -134,44 +134,46 @@ function UserMarkerMap({ userId, apiKey, mapId }: UserMarkerMapProps) {
     }, []);
 
     return (
-        <APIProvider apiKey={apiKey} onLoad={() => console.log("Maps API has loaded.")}>
-            <div style={{ width: "100%", height: "500px"}}>
-                <Map
+        <div>
+            <APIProvider apiKey={apiKey} onLoad={() => console.log("Maps API has loaded.")}>
+                <div style={{ width: "100%", height: "500px"}}>
+                    <Map
+                        className="marker-map"
+                        mapId={mapId}
+                        defaultZoom={18}
+                        defaultCenter={center} // Dynamic center
+                        onCameraChanged={(ev: MapCameraChangedEvent) =>
+                            console.log("camera changed:", ev.detail.center, "zoom:", ev.detail.zoom)
+                        }
+                    >
 
-                    mapId={mapId}
-                    defaultZoom={18}
-                    defaultCenter={center} // Dynamic center
-                    onCameraChanged={(ev: MapCameraChangedEvent) =>
-                        console.log("camera changed:", ev.detail.center, "zoom:", ev.detail.zoom)
-                    }
-                >
+                        {/* Pan the map to the selected marker when it changes */}
+                        <MapPanToSelectedMarker selectedMarker={selectedMarker} />
 
-                    {/* Pan the map to the selected marker when it changes */}
-                    <MapPanToSelectedMarker selectedMarker={selectedMarker} />
+                        <PoiMarkers pois={markers} onMarkerClick={handleMarkerClick}/>
 
-                    <PoiMarkers pois={markers} onMarkerClick={handleMarkerClick}/>
-
-                    {/* Info window! */}
-                    {selectedMarker && (
-                        <InfoWindow
-                            position={selectedMarker.location}
-                            onCloseClick={() => setSelectedMarker(null)}
-                        >
-                            <MarkerWindow
-                                name={selectedMarker.name}
-                                hasHotWater={selectedMarker.hasHotWater}
-                                hasColdWater={selectedMarker.hasColdWater}
-                                image={selectedMarker.image}
-                                description={selectedMarker.description}
-                                userName={selectedMarker.userName}
-                                userId={selectedMarker.userId}
-                                profilePicture={selectedMarker.profilePicture}
-                            />
-                        </InfoWindow>
-                    )}
-                </Map>
-            </div>
-        </APIProvider>
+                        {/* Info window! */}
+                        {selectedMarker && (
+                            <InfoWindow
+                                position={selectedMarker.location}
+                                onCloseClick={() => setSelectedMarker(null)}
+                            >
+                                <MarkerWindow
+                                    name={selectedMarker.name}
+                                    hasHotWater={selectedMarker.hasHotWater}
+                                    hasColdWater={selectedMarker.hasColdWater}
+                                    image={selectedMarker.image}
+                                    description={selectedMarker.description}
+                                    userName={selectedMarker.userName}
+                                    userId={selectedMarker.userId}
+                                    profilePicture={selectedMarker.profilePicture}
+                                />
+                            </InfoWindow>
+                        )}
+                    </Map>
+                </div>
+            </APIProvider>
+        </div>
     );
 }
 
