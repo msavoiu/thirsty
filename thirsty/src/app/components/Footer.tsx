@@ -7,7 +7,7 @@ export const Footer: React.FC = () => {
         <p className="text-center text-muted-foreground">
           Made with 💙 by{' '}
           <a
-            href="https://www.linkedin.com/in/madeline-savoiu"
+            href="https://www.linkedin.com/in/savoiu"
             target="_blank"
             rel="noopener noreferrer"
             className="underline hover:text-primary transition-colors"
