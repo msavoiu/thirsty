@@ -69,7 +69,7 @@ export const Navbar: React.FC = () => {
             ) : (
               <>
                 <button
-                  onClick={() => handleNavigation('signup')}
+                  onClick={() => handleNavigation('auth/signup')}
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
                   Sign Up
@@ -131,7 +131,7 @@ export const Navbar: React.FC = () => {
             ) : (
               <>
                 <button
-                  onClick={() => handleNavigation('signup')}
+                  onClick={() => handleNavigation('auth/signup')}
                   className="block w-full text-left py-2 px-3 rounded-lg hover:bg-accent transition-colors text-foreground"
                 >
                   Sign Up
