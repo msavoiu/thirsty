@@ -24,8 +24,6 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ params }: ProfilePageProps) =
   
   const router = useRouter();
   
-  // const { user, isAuthenticated } = useAuth();
-  const isAuthenticated = false;
   const [user, setUser] = useState<UserProfile | null>(null);
 
   const { id } = use(params);
@@ -40,7 +38,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ params }: ProfilePageProps) =
               "Content-Type": "application/json",
             },
             body: JSON.stringify({ userId: userId }),
-            });
+          });
 
             const userData = await res.json();
             

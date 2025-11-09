@@ -1,14 +1,35 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Menu, X, User } from 'lucide-react';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 
 export const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [userId, setUserId] = useState(0);
   const pathname = usePathname();
   const router = useRouter();
-  const isAuthenticated = false;
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const res = await fetch("/api/auth/whoami", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        }
+      });
+
+      const data = await res.json();
+
+      if (data.ok) {
+        setIsAuthenticated(true);
+        setUserId(data.userId)
+      }
+    };
+
+    fetchUserId();
+  }, []);
 
   const handleNavigation = (page: string) => {
     router.push(`/${page}`);
@@ -52,7 +73,7 @@ export const Navbar: React.FC = () => {
             {isAuthenticated ? (
               <>
                 <button
-                  onClick={() => handleNavigation('profile')}
+                  onClick={() => handleNavigation(`profile/${userId}`)}
                   className={`hover:text-primary transition-colors flex items-center ${
                     pathname === '/profile' ? 'text-primary' : 'text-muted-foreground'
                   }`}
@@ -113,7 +134,7 @@ export const Navbar: React.FC = () => {
             {isAuthenticated ? (
               <>
                 <button
-                  onClick={() => handleNavigation('profile')}
+                  onClick={() => handleNavigation(`profile/${userId}`)}
                   className={`block w-full text-left py-2 px-3 rounded-lg hover:bg-accent transition-colors flex items-center ${
                     pathname === '/profile' ? 'text-primary bg-accent' : 'text-foreground'
                   }`}
