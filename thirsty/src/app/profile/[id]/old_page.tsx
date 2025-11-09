@@ -1,62 +1,69 @@
 'use client';
 
-import React, { useState, useEffect, use } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
 // import { useAuth } from './AuthContext';
-import UserMarkerMap from "@/app/components/user_marker_map";
+import { MapComponent, Marker } from './MapComponent';
 import { User } from 'lucide-react';
-// import { api } from '../utils/api';
+import { api } from '../utils/api';
 
 interface ProfilePageProps {
-  params: Promise<{ id: string }>;
+  onNavigate: (page: string) => void;
 }
 
-interface UserProfile {
-  name: string;
-  profilePicture: string | null;
-  bottleCount: number;
-  markerCount: number;
-}
+export const ProfilePage: React.FC<ProfilePageProps> = ({ onNavigate }) => {
+  const { user, isAuthenticated } = useAuth();
+  const [userMarkers, setUserMarkers] = useState<Marker[]>([]);
+  const [loading, setLoading] = useState(true);
 
-const ProfilePage: React.FC<ProfilePageProps> = ({ params }: ProfilePageProps) => {
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string;
-  const mapId = process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID as string;
-  
-  const router = useRouter();
-  
-  // const { user, isAuthenticated } = useAuth();
-  const isAuthenticated = false;
-  const [user, setUser] = useState<UserProfile | null>(null);
+  useEffect(() => {
+    if (!isAuthenticated) {
+      onNavigate('login');
+      return;
+    }
 
-  const { id } = use(params);
-  const userId = parseInt(id, 10); // 10 tells it to parse as a decimal number
+    const fetchUserMarkers = async () => {
+      setLoading(true);
+      try {
+        // Fetch user's markers from API
+        const markers = await api.getUserMarkers(user!.id);
+        setUserMarkers(markers);
+      } catch (error) {
+        console.error('Error fetching user markers:', error);
+        // Fallback to mock data
+        setUserMarkers([
+        { 
+          id: 'user-1', 
+          lat: 40.7128, 
+          lng: -74.0060, 
+          name: 'My Local Park Fountain', 
+          userId: user?.id || '',
+          hasHotWater: false,
+          hasColdWater: true,
+          image: 'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=400',
+          description: 'Near the playground, perfect for refilling after a run',
+          userName: user?.displayName || '',
+          profilePicture: user?.profilePicture || ''
+        },
+        { 
+          id: 'user-2', 
+          lat: 40.7489, 
+          lng: -73.9680, 
+          name: 'Office Building Station', 
+          userId: user?.id || '',
+          hasHotWater: true,
+          hasColdWater: true,
+          image: 'https://images.unsplash.com/photo-1541672065485-dd7452a810b9?w=400',
+          description: 'First floor lobby, accessible during business hours',
+          userName: user?.displayName || '',
+          profilePicture: user?.profilePicture || ''
+        },
+        ]);
+      }
+      setLoading(false);
+    };
 
-    useEffect(() => {
-      async function fetchProfileInfo() {
-        try {
-          const res = await fetch("/api/profile/get", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ userId: userId }),
-            });
-
-            const userData = await res.json();
-            
-            if (!userData.ok) {
-              throw new Error("Failed to fetch");
-            }
-
-            setUser(userData);
-
-          } catch (error: any) {
-            return null;
-          }
-        }
-
-        fetchProfileInfo();
-    }, [userId]);
+    fetchUserMarkers();
+  }, [isAuthenticated, onNavigate, user]);
 
   if (!user) {
     return null;
@@ -71,7 +78,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ params }: ProfilePageProps) =
             {user.profilePicture ? (
               <img
                 src={user.profilePicture}
-                alt={user.name}
+                alt={user.displayName}
                 className="h-20 w-20 rounded-full object-cover border-2 border-border"
               />
             ) : (
@@ -80,8 +87,8 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ params }: ProfilePageProps) =
               </div>
             )}
             <div>
-              <h2 className="mb-1">{user.name}</h2>
-              {/* <p className="text-muted-foreground text-sm">@{user.username}</p> */}
+              <h2 className="mb-1">{user.displayName}</h2>
+              <p className="text-muted-foreground text-sm">@{user.username}</p>
             </div>
           </div>
 
@@ -89,13 +96,13 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ params }: ProfilePageProps) =
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-2xl p-6 text-center">
               <div className="text-3xl text-blue-600 mb-2">
-                {user.markerCount}
+                {user.waterStationsLogged}
               </div>
               <p className="text-blue-900">water stations logged</p>
             </div>
             <div className="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-2xl p-6 text-center">
               <div className="text-3xl text-green-600 mb-2">
-                {user.bottleCount}
+                {user.bottlesSaved}
               </div>
               <p className="text-green-900">plastic bottles saved</p>
             </div>
@@ -106,21 +113,16 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ params }: ProfilePageProps) =
         <div className="bg-white border border-border rounded-lg p-6 md:p-8">
           <h3 className="mb-4">My Water Stations</h3>
           <p className="text-muted-foreground mb-6">
-            {user.markerCount > 0 
+            {userMarkers.length > 0 
               ? 'Here are all the water stations you\'ve added to the map.' 
               : 'You haven\'t added any water stations yet. Visit the home page to get started!'}
           </p>
-
-          <UserMarkerMap
-            userId={userId}
-            apiKey={apiKey}
-            mapId={mapId}
-          />
+          <MapComponent markers={userMarkers} />
           
-          {user.markerCount === 0 && (
+          {userMarkers.length === 0 && (
             <div className="mt-6 text-center">
               <button
-                onClick={() => router.push('/')}
+                onClick={() => onNavigate('home')}
                 className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
               >
                 Add Your First Station
@@ -132,5 +134,3 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ params }: ProfilePageProps) =
     </div>
   );
 };
-
-export default ProfilePage;
