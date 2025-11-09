@@ -1,94 +1,152 @@
-"use client";
+'use client';
+import React, { useState } from 'react';
+import { Menu, X, User } from 'lucide-react';
+import Image from 'next/image';
+import { usePathname, useRouter } from 'next/navigation';
 
-import React, { useState, useEffect } from "react";
-import Link from "next/link";
-import { useUser } from "@/context/UserContext";
+export const Navbar: React.FC = () => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
+  const isAuthenticated = false;
 
-export default function Navbar() {
-    const { user, setUser } = useUser();
+  const handleNavigation = (page: string) => {
+    router.push(`/${page}`);
+    setMobileMenuOpen(false);
+  };
 
-    const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
-    const [profilePicture, setProfilePicture] = useState<string>("/icon.png");
+  const handleLogout = () => {
+    // logout();
+    router.push('/');
+  };
 
-    useEffect(() => {
-        async function checkLogin() {
-            try {
-                const authResponse = await fetch("/api/auth/whoami", {
-                    method: "POST",
-                    credentials: "include"
-                });
+  return (
+    <nav className="bg-white border-b border-border sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          {/* Logo */}
+          <div 
+            className="flex items-center cursor-pointer"
+            onClick={() => router.push('/')}
+          >
+            <Image
+              src="/logo.png"
+              alt="Thirsty Logo"
+              width={40}
+              height={40}
+              className="h-10 w-10 object-cover rounded-lg"
+            />
+            <span className="ml-3 text-primary">Thirsty</span>
+          </div>
 
-                const userAuth = await authResponse.json();
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-6">
+            <button
+              onClick={() => handleNavigation('about')}
+              className={`hover:text-primary transition-colors ${
+                pathname === '/about' ? 'text-primary' : 'text-muted-foreground'
+              }`}
+            >
+              About
+            </button>
+            {isAuthenticated ? (
+              <>
+                <button
+                  onClick={() => handleNavigation('profile')}
+                  className={`hover:text-primary transition-colors flex items-center ${
+                    pathname === '/profile' ? 'text-primary' : 'text-muted-foreground'
+                  }`}
+                >
+                  <User className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => handleNavigation('signup')}
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                >
+                  Sign Up
+                </button>
+                <button
+                  onClick={() => handleNavigation('login')}
+                  className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
+                >
+                  Login
+                </button>
+              </>
+            )}
+          </div>
 
-                if (userAuth.ok) {
-                    const userRes = await fetch("/api/user/get", {
-                        method: "POST",
-                        credentials: "include"
-                    });
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 rounded-lg hover:bg-accent transition-colors"
+          >
+            {mobileMenuOpen ? (
+              <X className="h-6 w-6 text-foreground" />
+            ) : (
+              <Menu className="h-6 w-6 text-foreground" />
+            )}
+          </button>
+        </div>
+      </div>
 
-                    if (!userRes.ok) {
-                        setLoggedIn(false);
-                    } else {
-                        const user = await userRes.json();
-                        const { profilePicture } = user;
-                        setProfilePicture(profilePicture);
-                    }
-                    setLoggedIn(true);
-                } else {
-                    setLoggedIn(false);
-                }
-
-            } catch (error: any) {
-                console.log(error.message);
-            } finally {
-                
-            }
-        }
-
-        checkLogin();
-    }, []);
-
-    const handleLogout = async () => {
-        try {
-            const res = await fetch("/api/auth/logout", { method: "POST" });
-            // Update context
-            setUser(null);
-
-            // // Reload homepage
-            window.location.reload();
-
-        } catch (error) {
-            console.error("Logout failed", error);
-        }
-    };
-
-    return (
-        <nav className="navbar">
-            <div className="navbar-left">
-                <a href="/" className="logo">
-                    <h1>
-                        Thirsty
-                    </h1>
-                </a>
-            </div>
-            <div className="navbar-right">
-                {loggedIn === true &&
-                    <Link href="/">
-                        <img src={profilePicture} alt=""/>
-                        <button
-                            onClick={handleLogout}
-                        >
-                            Logout
-                        </button>
-                    </Link>
-                }
-
-                {loggedIn === false &&
-                    <Link href="/auth/login">
-                        Login
-                    </Link>
-                }
-            </div>
-        </nav>
-    );
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t border-border">
+          <div className="px-4 py-4 space-y-3">
+            <button
+              onClick={() => handleNavigation('about')}
+              className={`block w-full text-left py-2 px-3 rounded-lg hover:bg-accent transition-colors ${
+                pathname === '/about' ? 'text-primary bg-accent' : 'text-foreground'
+              }`}
+            >
+              About
+            </button>
+            {isAuthenticated ? (
+              <>
+                <button
+                  onClick={() => handleNavigation('profile')}
+                  className={`block w-full text-left py-2 px-3 rounded-lg hover:bg-accent transition-colors flex items-center ${
+                    pathname === '/profile' ? 'text-primary bg-accent' : 'text-foreground'
+                  }`}
+                >
+                  <User className="h-5 w-5 mr-2" />
+                  Profile
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="block w-full text-left py-2 px-3 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => handleNavigation('signup')}
+                  className="block w-full text-left py-2 px-3 rounded-lg hover:bg-accent transition-colors text-foreground"
+                >
+                  Sign Up
+                </button>
+                <button
+                  onClick={() => handleNavigation('login')}
+                  className="block w-full text-left py-2 px-3 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
+                >
+                  Login
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+    </nav>
+  );
 };
