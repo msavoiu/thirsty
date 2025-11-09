@@ -75,7 +75,7 @@ export const Navbar: React.FC = () => {
                   Sign Up
                 </button>
                 <button
-                  onClick={() => handleNavigation('login')}
+                  onClick={() => handleNavigation('auth/login')}
                   className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
                 >
                   Login
@@ -137,7 +137,7 @@ export const Navbar: React.FC = () => {
                   Sign Up
                 </button>
                 <button
-                  onClick={() => handleNavigation('login')}
+                  onClick={() => handleNavigation('auth/login')}
                   className="block w-full text-left py-2 px-3 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
                 >
                   Login
