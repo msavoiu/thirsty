@@ -27,17 +27,6 @@ export default function LoginForm() {
 
         const data = await res.json();
 
-        if (data.ok) {
-            setUser({ name: data.name, profilePicture: data.profilePicture });
-            // alert(data.message);
-
-            // Redirect to home page
-            window.location.replace("/");
-            // router.push("/");
-        } else {
-            setLoginSuccess(false);
-            setResponseMessage(data.message);
-        }
     }
 
     return (
