@@ -1,6 +1,7 @@
-"use client";
+'use client';
 
 import React from "react";
+import Image from "next/image";
 import { Droplet, Flame, User, X } from "lucide-react";
 
 interface MarkerWindowProps {
@@ -10,7 +11,6 @@ interface MarkerWindowProps {
   image: string;
   description: string;
   userName: string;
-  userId: string;
   profilePicture: string;
   onClose?: () => void; // optional, if you use it as a modal
 }
@@ -22,7 +22,6 @@ const MarkerWindow: React.FC<MarkerWindowProps> = ({
   image,
   description,
   userName,
-  userId,
   profilePicture,
   onClose,
 }) => {
@@ -39,11 +38,12 @@ const MarkerWindow: React.FC<MarkerWindowProps> = ({
     >
       {/* Image (optional) */}
       {image && image !== "None" && (
-        <div className="w-full h-48 bg-gray-100">
-          <img
+        <div className="w-full h-48 bg-gray-100 relative">
+          <Image
             src={image}
             alt={name}
-            className="w-full h-full object-cover"
+            fill
+            style={{ objectFit: "cover" }}
           />
         </div>
       )}
@@ -63,11 +63,14 @@ const MarkerWindow: React.FC<MarkerWindowProps> = ({
         {/* User info */}
         <div className="flex items-center gap-2 mb-4">
           {pfp ? (
-            <img
-              src={pfp}
-              alt={userName}
-              className="h-6 w-6 rounded-full object-cover"
-            />
+            <div className="relative h-6 w-6">
+              <Image
+                src={pfp}
+                alt={userName}
+                fill
+                className="rounded-full object-cover"
+              />
+            </div>
           ) : (
             <div className="h-6 w-6 rounded-full bg-gray-200 flex items-center justify-center">
               <User className="h-3 w-3 text-gray-500" />

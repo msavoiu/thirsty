@@ -2,43 +2,38 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X, User } from 'lucide-react';
 import Image from 'next/image';
-import { usePathname, useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userId, setUserId] = useState(0);
   const pathname = usePathname();
-  const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     const fetchUserId = async () => {
       const res = await fetch("/api/auth/whoami", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        }
+        headers: { "Content-Type": "application/json" },
       });
 
       const data = await res.json();
 
       if (data.ok) {
         setIsAuthenticated(true);
-        setUserId(data.userId)
+        setUserId(data.userId);
       }
     };
 
     fetchUserId();
   }, []);
 
-  const handleNavigation = (page: string) => {
-    router.push(`/${page}`);
-    setMobileMenuOpen(false);
-  };
-
-  const handleLogout = () => {
-    // logout();
-    router.push('/');
+  const handleLogout = async () => {
+    // Call logout API if needed
+    await fetch("/api/auth/logout", { method: "POST" });
+    setIsAuthenticated(false);
+    setUserId(0);
   };
 
   return (
@@ -46,10 +41,7 @@ export const Navbar: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <div 
-            className="flex items-center cursor-pointer"
-            onClick={() => router.push('/')}
-          >
+          <Link href="/" className="flex items-center cursor-pointer">
             <Image
               src="/logo.png"
               alt="Thirsty Logo"
@@ -58,28 +50,29 @@ export const Navbar: React.FC = () => {
               className="h-10 w-10 object-cover rounded-lg"
             />
             <span className="ml-3 text-primary">Thirsty</span>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
-            <button
-              onClick={() => handleNavigation('about')}
+            <Link
+              href="/about"
               className={`hover:text-primary transition-colors ${
                 pathname === '/about' ? 'text-primary' : 'text-muted-foreground'
               }`}
             >
               About
-            </button>
+            </Link>
+
             {isAuthenticated ? (
               <>
-                <button
-                  onClick={() => handleNavigation(`profile/${userId}`)}
+                <Link
+                  href={`/profile/${userId}`}
                   className={`hover:text-primary transition-colors flex items-center ${
-                    pathname === '/profile' ? 'text-primary' : 'text-muted-foreground'
+                    pathname.startsWith('/profile') ? 'text-primary' : 'text-muted-foreground'
                   }`}
                 >
                   <User className="h-5 w-5" />
-                </button>
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
@@ -89,18 +82,18 @@ export const Navbar: React.FC = () => {
               </>
             ) : (
               <>
-                <button
-                  onClick={() => handleNavigation('auth/signup')}
+                <Link
+                  href="/auth/signup"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
                   Sign Up
-                </button>
-                <button
-                  onClick={() => handleNavigation('auth/login')}
+                </Link>
+                <Link
+                  href="/auth/login"
                   className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
                 >
                   Login
-                </button>
+                </Link>
               </>
             )}
           </div>
@@ -110,11 +103,7 @@ export const Navbar: React.FC = () => {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden p-2 rounded-lg hover:bg-accent transition-colors"
           >
-            {mobileMenuOpen ? (
-              <X className="h-6 w-6 text-foreground" />
-            ) : (
-              <Menu className="h-6 w-6 text-foreground" />
-            )}
+            {mobileMenuOpen ? <X className="h-6 w-6 text-foreground" /> : <Menu className="h-6 w-6 text-foreground" />}
           </button>
         </div>
       </div>
@@ -123,25 +112,26 @@ export const Navbar: React.FC = () => {
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-border">
           <div className="px-4 py-4 space-y-3">
-            <button
-              onClick={() => handleNavigation('about')}
+            <Link
+              href="/about"
               className={`block w-full text-left py-2 px-3 rounded-lg hover:bg-accent transition-colors ${
                 pathname === '/about' ? 'text-primary bg-accent' : 'text-foreground'
               }`}
             >
               About
-            </button>
+            </Link>
+
             {isAuthenticated ? (
               <>
-                <button
-                  onClick={() => handleNavigation(`profile/${userId}`)}
+                <Link
+                  href={`/profile/${userId}`}
                   className={`block w-full text-left py-2 px-3 rounded-lg hover:bg-accent transition-colors flex items-center ${
-                    pathname === '/profile' ? 'text-primary bg-accent' : 'text-foreground'
+                    pathname.startsWith('/profile') ? 'text-primary bg-accent' : 'text-foreground'
                   }`}
                 >
                   <User className="h-5 w-5 mr-2" />
                   Profile
-                </button>
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="block w-full text-left py-2 px-3 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
@@ -151,18 +141,18 @@ export const Navbar: React.FC = () => {
               </>
             ) : (
               <>
-                <button
-                  onClick={() => handleNavigation('auth/signup')}
+                <Link
+                  href="/auth/signup"
                   className="block w-full text-left py-2 px-3 rounded-lg hover:bg-accent transition-colors text-foreground"
                 >
                   Sign Up
-                </button>
-                <button
-                  onClick={() => handleNavigation('auth/login')}
+                </Link>
+                <Link
+                  href="/auth/login"
                   className="block w-full text-left py-2 px-3 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
                 >
                   Login
-                </button>
+                </Link>
               </>
             )}
           </div>

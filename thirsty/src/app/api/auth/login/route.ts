@@ -43,8 +43,12 @@ export async function POST(req: NextRequest) {
 
         return response;
 
-    } catch (error: any) {
-        console.error(error.message);
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error(error.message);
+        } else {
+            console.error('Unknown error', error);
+        }
         return NextResponse.json({ ok: false, message: "Server error" }, { status: 500 });
     }
 }

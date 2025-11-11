@@ -16,26 +16,26 @@ const AboutPage: React.FC = () => {
           <h2 className="mb-4">The Story</h2>
           <div className="space-y-4 text-muted-foreground">
             <p>
-              I live in Southern California, where the weather is pretty warm year round. No one knows 
+              {`I live in Southern California, where the weather is pretty warm year round. No one knows 
               better than us the importance of staying hydrated, but that doesn't mean it's always the
-              easiest. 
+              easiest.`}
             </p>
             <p>
-              I created this app as a personal project to combine my passions for software engineering
+              {`I created this app as a personal project to combine my passions for software engineering
               and environmental sustainability. The goal is simple: make it easy for 
               anyone to find and share the locations of water stations around the world, encouraging 
-              people to carry and refill reusable bottles instead of buying single-use plastic.
+              people to carry and refill reusable bottles instead of buying single-use plastic.`}
             </p>
             <p>
-              One of the biggest problems with sustainable living is it's not always the most convenient.
+              {`One of the biggest problems with sustainable living is it's not always the most convenient.
               Thirsty looks to change that by letting people know before they go, or while they're out and
-              about, where they can get access to free, clean drinking water without buying a bottle at the store.
+              about, where they can get access to free, clean drinking water without buying a bottle at the store.`}
             </p>
           </div>
         </div>
 
         <div className="bg-white border border-border rounded-lg p-6 md:p-8 mb-8">
-          <h2 className="mb-6">How It's Built</h2>
+          <h2 className="mb-6">{`How It's Built`}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="flex gap-4">
               <div className="h-12 w-12 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
@@ -68,7 +68,7 @@ const AboutPage: React.FC = () => {
               <div>
                 <h4 className="mb-1">Community</h4>
                 <p className="text-muted-foreground text-sm">
-                  User logging stations they discover makes the map better for everyone!
+                  Users logging stations they discover makes the map better for everyone!
                 </p>
               </div>
             </div>
@@ -80,7 +80,7 @@ const AboutPage: React.FC = () => {
               <div>
                 <h4 className="mb-1">Sustainability</h4>
                 <p className="text-muted-foreground text-sm">
-                  Inspired by real-life environmental issues I've learned about over the years
+                  {`Inspired by real-life environmental issues I've learned about over the years`}
                 </p>
               </div>
             </div>

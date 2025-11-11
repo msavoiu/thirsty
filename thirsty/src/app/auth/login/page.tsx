@@ -2,14 +2,9 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-// import { useAuth } from './AuthContext';
+import Link from 'next/link';
 
-interface LoginPageProps {
-  onNavigate: (page: string) => void;
-}
-
-const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
-  // const { login } = useAuth();
+const LoginPage: React.FC = () => {
   const router = useRouter();
 
   const [email, setEmail] = useState('');
@@ -100,13 +95,13 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
 
           <div className="mt-6 text-center">
             <p className="text-muted-foreground text-sm">
-              Don't have an account?{' '}
-              <button
-                onClick={() => onNavigate('signup')}
+              {`Don't have an account?`}{' '}
+              <Link
+                href="/auth/signup"
                 className="text-primary hover:underline"
               >
                 Sign up
-              </button>
+              </Link>
             </p>
           </div>
         </div>

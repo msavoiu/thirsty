@@ -1,17 +1,18 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
     try {
-        const body = await req.json();
-        const { userId } = body;
-
         const count = await prisma.marker.count();
 
         return NextResponse.json({ ok: true, count: count }, { status: 200 });
 
-    } catch (error: any) {
-        console.log(error.message);
-        return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error(error.message);
+        } else {
+            console.error('Unknown error', error);
+        }
+        return NextResponse.json({ ok: false }, { status: 500 });
     }
 }

@@ -9,11 +9,10 @@ import {
     Pin,
     useMap,
     InfoWindow,
-    MapMouseEvent
 } from "@vis.gl/react-google-maps";
 
 // Components
-import MarkerWindow from "./marker_window";
+import MarkerWindow from "./MarkerWindow";
 
 // Type declarations for TS
 type UserMarkerMapProps = {
@@ -35,6 +34,22 @@ type Marker = {
     userId: string;
     profilePicture: string;
 }
+
+type MarkerResponse = {
+  lat: number;
+  lng: number;
+  name: string;
+  hasHotWater: boolean;
+  hasColdWater: boolean;
+  image: string;
+  user: {
+    name: string;
+    id: string;
+    profilePicture: string;
+  };
+  description: string
+};
+
 
 function MapPanToSelectedMarker({ selectedMarker }: { selectedMarker: Marker | null }) {
     const map = useMap();
@@ -114,7 +129,7 @@ function UserMarkerMap({ userId, apiKey, mapId }: UserMarkerMapProps) {
             const data = await res.json();
 
             // Transform the data to match Marker type
-            const markers: Marker[] = data.markers.map((m: any, idx: number) => ({
+            const markers: Marker[] = data.markers.map((m: MarkerResponse, idx: number) => ({
                 key: idx.toString(), // or use another unique value if available
                 location: { lat: m.lat, lng: m.lng },
                 name: m.name,
@@ -122,9 +137,8 @@ function UserMarkerMap({ userId, apiKey, mapId }: UserMarkerMapProps) {
                 hasColdWater: m.hasColdWater,
                 image: m.image,
                 userName: m.user.name,
-                userId: m.user.id,
                 profilePicture: m.user.profilePicture,
-                
+                description: m.description || "",
             }));
 
             setMarkers(markers);
@@ -165,7 +179,6 @@ function UserMarkerMap({ userId, apiKey, mapId }: UserMarkerMapProps) {
                                     image={selectedMarker.image}
                                     description={selectedMarker.description}
                                     userName={selectedMarker.userName}
-                                    userId={selectedMarker.userId}
                                     profilePicture={selectedMarker.profilePicture}
                                 />
                             </InfoWindow>

@@ -2,11 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-// import { useAuth } from './AuthContext';
+import Image from 'next/image'; // <-- Import Image
 import { Upload } from 'lucide-react';
 
 const SignUpPage: React.FC = () => {
-//   const { signup } = useAuth();
   const router = useRouter();
 
   const [displayName, setDisplayName] = useState('');
@@ -29,7 +28,7 @@ const SignUpPage: React.FC = () => {
     const url = URL.createObjectURL(profilePicture);
     setPreviewURL(url);
 
-    return () => URL.revokeObjectURL(url); // Cleanup to prevent memory leaks
+    return () => URL.revokeObjectURL(url);
   }, [profilePicture]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -59,7 +58,7 @@ const SignUpPage: React.FC = () => {
       setError('Failed to create account. Please try again.');
     }
 
-      setLoading(false);
+    setLoading(false);
   };
 
   return (
@@ -125,10 +124,12 @@ const SignUpPage: React.FC = () => {
 
               {previewURL && (
                 <div className="mt-3 flex items-center gap-3">
-                  <img
+                  <Image
                     src={previewURL}
                     alt="Profile preview"
-                    className="h-12 w-12 rounded-full object-cover border border-border"
+                    width={48}
+                    height={48}
+                    className="rounded-full object-cover border border-border"
                   />
                   <span className="text-sm text-muted-foreground">Preview</span>
                 </div>

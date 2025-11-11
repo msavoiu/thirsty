@@ -13,7 +13,12 @@ export async function GET() {
 
         return Response.json({ ok: true }, { status: 200 });
 
-    } catch (error: any) {
-        return Response.json({ message: error.message, ok: false }, { status: 500 });
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error(error.message);
+        } else {
+            console.error('Unknown error', error);
+        }
+        return Response.json({ ok: false }, { status: 500 });
     }
 }

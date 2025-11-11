@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import jwt from "jsonwebtoken";
 
+interface JwtPayload {
+  userId: string;
+}
+
 export async function POST(req: NextRequest) {
     try {
         // Retrieve token from HTTP cookies
@@ -11,11 +15,16 @@ export async function POST(req: NextRequest) {
         }
 
         // Decode the user ID
-        let decoded: any;
+        let decoded: JwtPayload;
 
         try {
-            decoded = jwt.verify(token, process.env.JWT_SECRET as string);
-        } catch (err) {
+            decoded = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload;;
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                console.error(error.message);
+            } else {
+                console.error('Unknown error', error);
+            }
             return NextResponse.json({ ok: false, error: "Unauthorized: Invalid token" }, { status: 401 });
         }
 
@@ -40,8 +49,12 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json({ ok: true, name: user.name, profilePicture: user.profilePicture }, { status: 200 });
 
-    } catch (error: any) {
-        console.log(error.message);
-        return NextResponse.json({ ok: false, message: error.message }, { status: 500 });
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error(error.message);
+        } else {
+            console.error('Unknown error', error);
+        }
+        return NextResponse.json({ ok: false }, { status: 500 });
     }
 }

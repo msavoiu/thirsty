@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
     APIProvider,
     Map,
@@ -36,6 +36,21 @@ type Marker = {
     userId: string;
     profilePicture: string;
 }
+
+type MarkerResponse = {
+  lat: number;
+  lng: number;
+  name: string;
+  hasHotWater: boolean;
+  hasColdWater: boolean;
+  image: string;
+  user: {
+    name: string;
+    id: string;
+    profilePicture: string;
+  };
+};
+
 
 // // TEST marker for development purposes
 // const markers: Marker[] = [
@@ -87,8 +102,8 @@ function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
     // For rendering info windows for specified markers
     const [selectedMarker, setSelectedMarker] = useState<Marker | null>(null);
 
-    const[currentLat, setCurrentLat] = useState<Number>(0);
-    const[currentLng, setCurrentLng] = useState<Number>(0);
+    const[currentLat, setCurrentLat] = useState<number>(0);
+    const[currentLng, setCurrentLng] = useState<number>(0);
     const[newMarker, setNewMarker] = useState<Marker | null>(null);
     const [markers, setMarkers] = useState<Marker[]>([]);
 
@@ -148,7 +163,7 @@ function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
             const data = await res.json();
 
             // Transform the data to match Marker type
-            const markers: Marker[] = data.markers.map((m: any, idx: number) => ({
+            const markers: Marker[] = data.markers.map((m: MarkerResponse, idx: number) => ({
                 key: idx.toString(), // or use another unique value if available
                 location: { lat: m.lat, lng: m.lng },
                 name: m.name,
@@ -199,7 +214,6 @@ function MarkerMap({ apiKey, mapId }: MarkerMapProps) {
                                 image={selectedMarker.image}
                                 description={selectedMarker.description}
                                 userName={selectedMarker.userName}
-                                userId={selectedMarker.userId}
                                 profilePicture={selectedMarker.profilePicture}
                             />
                         </InfoWindow>

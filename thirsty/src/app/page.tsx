@@ -48,7 +48,7 @@ const HomePage: React.FC = () => {
       {/* Bottle Counter Section */}
       <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-12 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="mb-2 text-white">Together, we've saved</h2>
+          <h2 className="mb-2 text-white">{`Together, we've saved`}</h2>
           <div className="text-5xl md:text-6xl mb-2">
             {bottleCount.toLocaleString()}
           </div>
