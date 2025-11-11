@@ -10,20 +10,37 @@ const HomePage: React.FC = () => {
   const mapId = process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID as string;
 
   // const { isAuthenticated, user } = useAuth();
-  const isAuthenticated = false;
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [stationCount, setStationCount] = useState(0);
   const [bottleCount, setBottleCount] = useState(0);
-  const stationCount = 290834;
 
   useEffect(() => {
-    // Mock API call to fetch bottle count
-    const fetchBottleCount = async () => {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-      // Mock data - in production, this would come from Supabase
-      setBottleCount(15420);
+    // Check authentication
+    const fetchAuthentication = async () => {
+      const res = await fetch("/api/auth/whoami", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        }
+      });
+
+      const data = await res.json();
+
+      if (data.ok) {
+        setIsAuthenticated(true);
+      }
     };
 
-    fetchBottleCount();
+    const fetchBottleAndStationCount = async () => {
+      const res = await fetch("/api/counts/get");
+
+      const data = await res.json();
+      setStationCount(data.stationsLogged);
+      setBottleCount(data.bottlesSaved);
+    };
+
+    fetchAuthentication();
+    fetchBottleAndStationCount();
   }, []);
 
   return (
@@ -42,7 +59,7 @@ const HomePage: React.FC = () => {
       {/* Map Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-4">
-          <h2 className="mb-2">Water Stations Around the World</h2>
+          <h2 className="mb-2">Water Stations</h2>
           <p className="text-muted-foreground">
             {isAuthenticated 
               ? 'Click on the map to add a new water station!' 
