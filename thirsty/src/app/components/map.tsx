@@ -13,9 +13,8 @@ import {
 } from "@vis.gl/react-google-maps";
 
 // Components
-// import MarkerWindow from "./marker_window";
 import MarkerWindow from "./MarkerWindow";
-import NewMarkerForm from "./new_marker_form"; 
+import NewMarkerForm from "./NewMarkerForm"; 
 
 // Type declarations for TS
 type MarkerMapProps = {
