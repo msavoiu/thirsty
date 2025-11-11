@@ -5,8 +5,8 @@ export async function GET() {
         await prisma.bottleCounter.update({
             where: { id: 1 },
             data: {
-                bottles: {
-                increment: 1,
+                count: {
+                    increment: 1,
                 },
             },
         });
